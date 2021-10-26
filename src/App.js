@@ -3,6 +3,10 @@ import "./App.css";
 import lottery from "./lottery";
 import web3 from "./web3";
 
+import EN_STRINGS from "./strings";
+
+const ETHER = "ether";
+
 function App() {
   const [manager, setManager] = useState("");
   const [players, setPlayers] = useState([]);
@@ -46,14 +50,14 @@ function App() {
     event.preventDefault();
 
     try {
-      setMessage("Waiting on transaction success...");
+      setMessage(EN_STRINGS.WAITING_TRANSACTION);
       await lottery.methods.enter().send({
         from: accounts[0],
-        value: web3.utils.toWei(amountToEnter, "ether"),
+        value: web3.utils.toWei(amountToEnter, ETHER),
       });
-      setMessage("You have been entered!");
+      setMessage(EN_STRINGS.SUCCESS_ON_ENTER);
     } catch (err) {
-      setMessage("Error on transaction: ", err.message);
+      setMessage(EN_STRINGS.ERROR_TRANSACTION, err.message);
     } finally {
       clearMessage();
     }
@@ -63,18 +67,18 @@ function App() {
     event.preventDefault();
 
     try {
-      setMessage("Waiting on transaction success...");
+      setMessage(EN_STRINGS.WAITING_TRANSACTION);
       const { transactionHash } = await lottery.methods.pickWinner().send({
         from: accounts[0],
       });
       setMessage(
-        `The transaction hash for the winner is: ${transactionHash} Prize: ${web3.utils.fromWei(
-          balance,
-          "ether",
-        )} eth`,
+        EN_STRINGS.SUCCESS_PICK_WINNER(
+          transactionHash,
+          web3.utils.fromWei(balance, ETHER),
+        ),
       );
     } catch (err) {
-      setMessage("Error on transaction: ", err.message);
+      setMessage(EN_STRINGS.ERROR_TRANSACTION, err.message);
     } finally {
       clearMessage();
     }
@@ -97,7 +101,7 @@ function App() {
       <p>This contract is managed by: {manager}</p>
       <p>
         There are currently {players.length} players competing to win{" "}
-        {web3.utils.fromWei(balance, "ether")} eth
+        {web3.utils.fromWei(balance, ETHER)} eth
       </p>
       <hr />
       {!players.includes(accounts[0]) ? (
