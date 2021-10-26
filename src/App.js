@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import lottery from "./lottery";
-import web3 from "./web3";
+import { utils } from "./web3";
 
 import EN_STRINGS from "./strings";
 import { fetchAccounts, fetchBalance } from "./services/metamask.service";
-import { fetchManager, fetchPlayers } from "./services/lottery.service";
+import {
+  enterLottery,
+  fetchManager,
+  fetchPlayers,
+  pickWinner,
+} from "./services/lottery.service";
 
 const ETHER = "ether";
 
@@ -33,10 +37,7 @@ function App() {
 
     try {
       setMessage(EN_STRINGS.WAITING_TRANSACTION);
-      await lottery.methods.enter().send({
-        from: accounts[0],
-        value: web3.utils.toWei(amountToEnter, ETHER),
-      });
+      enterLottery(accounts[0], utils.toWei(amountToEnter, ETHER));
       setMessage(EN_STRINGS.SUCCESS_ON_ENTER);
     } catch (err) {
       setMessage(EN_STRINGS.ERROR_TRANSACTION, err.message);
@@ -50,13 +51,11 @@ function App() {
 
     try {
       setMessage(EN_STRINGS.WAITING_TRANSACTION);
-      const { transactionHash } = await lottery.methods.pickWinner().send({
-        from: accounts[0],
-      });
+      const transactionHash = pickWinner(accounts[0]);
       setMessage(
         EN_STRINGS.SUCCESS_PICK_WINNER(
           transactionHash,
-          web3.utils.fromWei(balance, ETHER),
+          utils.fromWei(balance, ETHER),
         ),
       );
     } catch (err) {
@@ -83,7 +82,7 @@ function App() {
       <p>This contract is managed by: {manager}</p>
       <p>
         There are currently {players.length} players competing to win{" "}
-        {web3.utils.fromWei(balance, ETHER)} eth
+        {utils.fromWei(balance, ETHER)} eth
       </p>
       <hr />
       {!players.includes(accounts[0]) ? (
