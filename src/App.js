@@ -4,6 +4,8 @@ import lottery from "./lottery";
 import web3 from "./web3";
 
 import EN_STRINGS from "./strings";
+import { fetchAccounts, fetchBalance } from "./services/metamask.service";
+import { fetchManager, fetchPlayers } from "./services/lottery.service";
 
 const ETHER = "ether";
 
@@ -21,26 +23,6 @@ function App() {
     setTimeout(() => {
       setMessage("");
     }, 3000);
-
-  const fetchManager = async () => {
-    const contractManager = await lottery.methods.manager().call();
-    setManager(contractManager);
-  };
-
-  const fetchPlayers = async () => {
-    const contractPlayers = await lottery.methods.getPlayers().call();
-    setPlayers(contractPlayers);
-  };
-
-  const fetchBalance = async () => {
-    const contractBalance = await web3.eth.getBalance(lottery.options.address);
-    setBalance(contractBalance);
-  };
-
-  const fetchAccounts = async () => {
-    const walletAccounts = await web3.eth.getAccounts();
-    setAccounts(walletAccounts);
-  };
 
   const onValueChange = (event) => {
     setAmountToEnter(event.target.value);
@@ -85,13 +67,13 @@ function App() {
   };
 
   useEffect(() => {
-    fetchManager();
-    fetchPlayers();
-    fetchBalance();
-    fetchAccounts();
+    fetchManager().then(setManager);
+    fetchPlayers().then(setPlayers);
+    fetchBalance().then(setBalance);
+    fetchAccounts().then(setAccounts);
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", () => {
-        fetchAccounts();
+        fetchAccounts().then(setAccounts);
       });
     }
   }, [message]);
