@@ -85,7 +85,10 @@ function App() {
   return (
     <div className="App">
       <h2>Lottery Contract</h2>
-      <p>This contract is managed by: {manager}</p>
+      <p>
+        This contract is managed by:{" "}
+        {manager === currentAccount ? "you" : manager}
+      </p>
       <p>Current account: {currentAccount}</p>
       <p>
         There are currently {players.length} players competing to win{" "}
