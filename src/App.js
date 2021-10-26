@@ -110,7 +110,11 @@ function App() {
           <div>
             <label>Amount of ether to enter</label>
             <br />
-            <input value={amountToEnter} onChange={onValueChange} />
+            <input
+              type="number"
+              value={amountToEnter}
+              onChange={onValueChange}
+            />
           </div>
           <button disabled={message !== ""}>Enter</button>
         </form>
