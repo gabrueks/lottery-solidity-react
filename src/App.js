@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { utils } from "./web3";
+import web3 from "./web3";
 
 import EN_STRINGS from "./strings";
 import { fetchAccounts, fetchBalance } from "./services/metamask.service";
@@ -18,6 +18,7 @@ function App() {
   const [players, setPlayers] = useState([]);
   const [balance, setBalance] = useState("");
   const [accounts, setAccounts] = useState([]);
+  const [currentAccount, setCurrentAccount] = useState("");
 
   const [amountToEnter, setAmountToEnter] = useState("0");
 
@@ -37,7 +38,7 @@ function App() {
 
     try {
       setMessage(EN_STRINGS.WAITING_TRANSACTION);
-      enterLottery(accounts[0], utils.toWei(amountToEnter, ETHER));
+      enterLottery(currentAccount, web3.utils.toWei(amountToEnter, ETHER));
       setMessage(EN_STRINGS.SUCCESS_ON_ENTER);
     } catch (err) {
       setMessage(EN_STRINGS.ERROR_TRANSACTION, err.message);
@@ -51,11 +52,11 @@ function App() {
 
     try {
       setMessage(EN_STRINGS.WAITING_TRANSACTION);
-      const transactionHash = pickWinner(accounts[0]);
+      const transactionHash = pickWinner(currentAccount);
       setMessage(
         EN_STRINGS.SUCCESS_PICK_WINNER(
           transactionHash,
-          utils.fromWei(balance, ETHER),
+          web3.utils.fromWei(balance, ETHER),
         ),
       );
     } catch (err) {
@@ -76,16 +77,22 @@ function App() {
       });
     }
   }, [message]);
+
+  useEffect(() => {
+    setCurrentAccount(accounts[0]);
+  }, [accounts]);
+
   return (
     <div className="App">
       <h2>Lottery Contract</h2>
       <p>This contract is managed by: {manager}</p>
+      <p>Current account: {currentAccount}</p>
       <p>
         There are currently {players.length} players competing to win{" "}
-        {utils.fromWei(balance, ETHER)} eth
+        {web3.utils.fromWei(balance, ETHER)} eth
       </p>
       <hr />
-      {!players.includes(accounts[0]) ? (
+      {!players.includes(currentAccount) ? (
         <form onSubmit={onEnter}>
           <h4>Want to try your luck?</h4>
           <div>
@@ -104,7 +111,7 @@ function App() {
       )}
       <hr />
 
-      {accounts[0] === manager && players.length > 0 && (
+      {currentAccount === manager && players.length > 0 && (
         <div>
           <h4>Ready to pick a winner?</h4>
           <button disabled={message !== ""} onClick={onPickAWinner}>
