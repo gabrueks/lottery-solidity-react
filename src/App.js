@@ -38,7 +38,10 @@ function App() {
 
     try {
       setMessage(EN_STRINGS.WAITING_TRANSACTION);
-      enterLottery(currentAccount, web3.utils.toWei(amountToEnter, ETHER));
+      await enterLottery(
+        currentAccount,
+        web3.utils.toWei(amountToEnter, ETHER),
+      );
       setMessage(EN_STRINGS.SUCCESS_ON_ENTER);
     } catch (err) {
       setMessage(EN_STRINGS.ERROR_TRANSACTION, err.message);
@@ -52,7 +55,7 @@ function App() {
 
     try {
       setMessage(EN_STRINGS.WAITING_TRANSACTION);
-      const transactionHash = pickWinner(currentAccount);
+      const transactionHash = await pickWinner(currentAccount);
       setMessage(
         EN_STRINGS.SUCCESS_PICK_WINNER(
           transactionHash,
